@@ -1,9 +1,9 @@
 //
 //  main.cpp
-//  LyleLib
+//  Base64
 //
-//  Created by Lyle Moffitt on 12/16/14.
-//  Copyright (c) 2014 Lyle Moffitt. All rights reserved.
+//  Created by Lyle Moffitt on 3/17/15.
+//  Copyright (c) 2015 Lyle Moffitt. All rights reserved.
 //
 
 #include <iostream>
