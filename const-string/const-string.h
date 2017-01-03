@@ -1,13 +1,13 @@
 //
-//  LL_string-case.h
+//  const-string_h.h
 //  LyleLib
 //
 //  Created by Lyle Moffitt on 12/16/14.
 //  Copyright (c) 2014 Lyle Moffitt. All rights reserved.
 //
 
-#ifndef LyleLib_LL_string_const_h
-#define LyleLib_LL_string_const_h
+#ifndef LL_const_string_h
+#define LL_const_string_h
 
 #include <cstdio>
 #include <functional>
@@ -261,11 +261,14 @@ constexpr const inline
 size_t 
 operator""_hash(const char * str, size_t sz)
 {
+#ifdef MURMER_DEV
     return murmer<size_t>()( (const byte *)(const size_t)(str) , sz);
-//    return recursive_hash(0x5bd1e995, str, sz);//murmer(str, sz)();
+#else
+    return recursive_hash(0x5bd1e995, str, sz);//murmer(str, sz)();
+#endif
 }
 
 
 
 
-#endif // LyleLib_LL_string_const_h
+#endif // LL_const_string_h

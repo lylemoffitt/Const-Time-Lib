@@ -8,31 +8,35 @@
 Included here is a collection of small projects that grew out of a need I saw in C++, that strings cannot be the indexes (`case`s) of a `switch` block. While most-other POD types can, the closest you can get is using the pointer addresses. This won't be good enough if you're `switch` parameter is anything other than an r-value reference to one of the strings (a tricky proposition in itself). 
 
 In short, I set out to make something like the following possible.
-````.cpp
-    string arg = "foo";
 
-    switch(arg)
-    {
-        case "foo":
-            /* ... */
-            break;
-        
-        case "bar":
-            /* ... */
-            break;
-        
-        default:
-    }
-````
+```cpp
+string arg = "foo";
+
+switch(arg)
+{
+    case "foo":
+        /* ... */
+        break;
+    
+    case "bar":
+        /* ... */
+        break;
+    
+    default:
+}
+```
 
 ### Implementation
 
 At first approach, it would seem that this is a non-problem. The solution is simple, *hashes*! While this should work in theory, because we are simplifying the objects down to POD, `size_t`, numbers; in practice, it's impossible because the hashes aren't calculated at *compile-time*, but at run-time. That being said, using something like `std::unordered_map<std::string,std::function<void(void)>>` is certainly possible, if you're willing to accept the run-time cost *and* have access to the STL. Unfortunately, neither is really an option if you're programming for embedded environments. That being said, algorithmically this is entirely the right approach. So that's what I did.
 
 
-### String Switch [super-alpha]
+### Const-String [alpha]
 
-Under `String Switch/` you will find my first-draft implementation. It uses a simple hashing function implemented with meta-template programming techniques to ensure compile-time conclusion. It's conveniently accessible as a `constexpr` [operator-literal](http://en.cppreference.com/w/cpp/language/user_literal) function. In short, if you *my* hashing function it will work. However, this isn't compatible with `std::hash<std::string>`, which uses the much more complex [City Hash](https://www.wikiwand.com/en/CityHash) or [Murmer Hash](https://www.wikiwand.com/en/MurmurHash) depending on your platform. This is the jumping off point for the rest of the libraries.
+Under `const-string/` you will find my first-draft implementation. It uses a simple hashing function implemented with meta-template programming techniques to ensure compile-time conclusion. It's conveniently accessible as a `constexpr` [operator-literal](http://en.cppreference.com/w/cpp/language/user_literal) function. In short, if you use *my* hashing function it will work. However, this isn't compatible with `std::hash<std::string>`, which uses the much more complex [City Hash](https://www.wikiwand.com/en/CityHash) or [Murmer Hash](https://www.wikiwand.com/en/MurmurHash) depending on your platform. 
+
+> Check `const-string/main.cpp` for a working example.
+
 
 
 ### Const-Function [WIP]
