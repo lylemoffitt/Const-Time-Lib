@@ -42,6 +42,12 @@ public:
     {
         return (sz!=_cs.sz?false: true);
     }
+    inline
+    operator std::string(){
+        return std::string(data);
+    }
+
+    
 };
 
 
@@ -69,8 +75,39 @@ public:
     constexpr bool operator==(const const_str & _cs ) const 
     {   return (sz!=_cs.sz?false: true);
     }
+
+    template<class...Tps>
+    constexpr inline
+    bool operator==(const const_str<Tps...> & _cs ) const
+    {   return (size()!=_cs.size()?false: true);
+    }
+
+    inline
+    operator std::string(){
+        return std::string(data);
+    }
 };
 
+
+template<int ...> struct Sequence { };
+template<int N, int ...S> struct CreateSequence : CreateSequence<N-1, N-1, S...> { };
+template<int ...S> struct CreateSequence<0, S...> { typedef Sequence<S...> Type; };
+
+template<int N, int ...S>
+constexpr
+auto
+Unpack(const char (&s)[N], Sequence<S...>) -> const_str<s[S]...>
+{
+    return const_str<s[S]...>();
+}
+
+inline constexpr
+auto
+operator "" _const(const char * val, size_t sz)
+->decltype(Unpack( val, typename CreateSequence<sz>::Type()))
+{
+    return Unpack( val, typename CreateSequence<sz>::Type());
+}
 
 typedef uint8_t byte;
 
