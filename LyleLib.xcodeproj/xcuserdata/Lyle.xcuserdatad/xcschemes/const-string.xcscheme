@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "26262F081A4108E300D4E094"
-               BuildableName = "const-string-switch"
-               BlueprintName = "const-string-switch"
+               BuildableName = "const-string"
+               BlueprintName = "const-string"
                ReferencedContainer = "container:LyleLib.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,8 +33,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "26262F081A4108E300D4E094"
-            BuildableName = "const-string-switch"
-            BlueprintName = "const-string-switch"
+            BuildableName = "const-string"
+            BlueprintName = "const-string"
             ReferencedContainer = "container:LyleLib.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -56,8 +56,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "26262F081A4108E300D4E094"
-            BuildableName = "const-string-switch"
-            BlueprintName = "const-string-switch"
+            BuildableName = "const-string"
+            BlueprintName = "const-string"
             ReferencedContainer = "container:LyleLib.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -75,8 +75,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "26262F081A4108E300D4E094"
-            BuildableName = "const-string-switch"
-            BlueprintName = "const-string-switch"
+            BuildableName = "const-string"
+            BlueprintName = "const-string"
             ReferencedContainer = "container:LyleLib.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

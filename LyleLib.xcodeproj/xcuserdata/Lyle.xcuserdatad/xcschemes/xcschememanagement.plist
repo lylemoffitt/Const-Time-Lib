@@ -9,15 +9,15 @@
 			<key>orderHint</key>
 			<integer>3</integer>
 		</dict>
-		<key>String Switch.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>0</integer>
-		</dict>
 		<key>const-function.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>1</integer>
+		</dict>
+		<key>const-string.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>0</integer>
 		</dict>
 		<key>smart-reference.xcscheme</key>
 		<dict>
