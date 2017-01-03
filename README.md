@@ -33,11 +33,19 @@ At first approach, it would seem that this is a non-problem. The solution is sim
 
 ### Const-String [alpha]
 
-Under `const-string/` you will find my first-draft implementation. It uses a simple hashing function implemented with meta-template programming techniques to ensure compile-time conclusion. It's conveniently accessible as a `constexpr` [operator-literal](http://en.cppreference.com/w/cpp/language/user_literal) function. In short, if you use *my* hashing function it will work. However, this isn't compatible with `std::hash<std::string>`, which uses the much more complex [City Hash](https://www.wikiwand.com/en/CityHash) or [Murmer Hash](https://www.wikiwand.com/en/MurmurHash) depending on your platform. 
+Under `const-string/` you will find my first-draft implementation. It uses a simple hashing function implemented with meta-template programming techniques to ensure compile-time conclusion. It's conveniently accessible as a `constexpr` [operator-literal](http://en.cppreference.com/w/cpp/language/user_literal) function. In short, if you use *my* hashing function it will work. However, this isn't compatible with `std::hash<std::string>`, which uses the much more complex [City Hash](https://www.wikiwand.com/en/CityHash) or [Murmur Hash](https://www.wikiwand.com/en/MurmurHash) depending on your platform. 
 
 > Check `const-string/main.cpp` for a working example.
 
+Development goals:
 
+- [x] Proof of concept with compile-time hashing function
+- [ ] Specialize `std::hash<const_str>` for compatibility with `std::unordered_map`
+- [ ] Test/compare performance of:
+ - `std::unordered_map<std::string,*>` (curent state of the art)
+ - `std::unordered_map<const_str,*>` (STL enabled with this implementation)
+ - `switch` block using `const_str`(full-custom implementation)
+- [ ] Implement Murmur Hash and City Hash using compile-time programming
 
 ### Const-Function [WIP]
 
