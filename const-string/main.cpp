@@ -13,22 +13,25 @@
 #include <string>
 
 
-using namespace std;
 int main(int argc, const char * argv[])
 {
 
-    
-    string str = "hello";
-    
-    hash<string> hs;
-    
+    using namespace LL;
+
+    std::string str = "hello";
+
+#ifdef MURMER_DEV
+    std::hash<std::string> hs;
     switch (hs(str)) {
+#else
+    switch( recursive_hash(str.c_str(), str.length()) ){
+#endif
         case "hello"_hash:
-            cout << "MATCH\n";
+            std::cout << "MATCH\n";
             break;
             
         default:
-            cout << "FAIL\n";
+            std::cout << "FAIL\n";
             break;
     }
     

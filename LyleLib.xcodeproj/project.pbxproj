@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2600E95B1E1C204B0020FB13 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2600E95A1E1C204B0020FB13 /* main.cpp */; };
 		26262F1A1A4143EF00D4E094 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26262F191A4143EF00D4E094 /* main.cpp */; };
 		267640401AB7E08B000B0AE3 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2676403F1AB7E08B000B0AE3 /* main.cpp */; };
 		267640481AB7E0B9000B0AE3 /* LL_base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267640461AB7E0B9000B0AE3 /* LL_base64.cpp */; };
@@ -53,7 +54,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2600E9561E1C09B90020FB13 /* const-string */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "const-string"; sourceTree = "<group>"; };
+		2600E9591E1C204B0020FB13 /* const-string.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "const-string.h"; path = "const-string/const-string.h"; sourceTree = "<group>"; };
+		2600E95A1E1C204B0020FB13 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = "const-string/main.cpp"; sourceTree = "<group>"; };
 		26262F091A4108E300D4E094 /* const-string */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "const-string"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26262F171A4143EF00D4E094 /* const-function */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "const-function"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26262F191A4143EF00D4E094 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -100,10 +102,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2600E9581E1C20310020FB13 /* const-string */ = {
+			isa = PBXGroup;
+			children = (
+				2600E9591E1C204B0020FB13 /* const-string.h */,
+				2600E95A1E1C204B0020FB13 /* main.cpp */,
+			);
+			name = "const-string";
+			sourceTree = "<group>";
+		};
 		26262EF01A4108B400D4E094 = {
 			isa = PBXGroup;
 			children = (
-				2600E9561E1C09B90020FB13 /* const-string */,
+				2600E9581E1C20310020FB13 /* const-string */,
 				26262F181A4143EF00D4E094 /* const-function */,
 				268F9DFC1A5C738200CB6CE4 /* smart-reference */,
 				2676403E1AB7E08B000B0AE3 /* Base64 */,
@@ -256,6 +267,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2600E95B1E1C204B0020FB13 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
