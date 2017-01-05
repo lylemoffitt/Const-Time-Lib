@@ -14,6 +14,11 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
+		<key>const-hash.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
+		</dict>
 		<key>const-string.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -27,6 +32,26 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>2600E95F1E1C2BB20020FB13</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>2600E96C1E1C58B80020FB13</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>2600E97B1E1C98B30020FB13</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>2600E9871E1DB68D0020FB13</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>26262EF81A4108B400D4E094</key>
 		<dict>
 			<key>primary</key>
