@@ -177,6 +177,7 @@ namespace ctxe_funct
                       .bind(even)
                       .value == false
                       ,"");
+        static_assert(22 == unit(22),"");
     }//namespace test
 
 

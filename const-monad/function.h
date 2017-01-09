@@ -12,30 +12,39 @@
 
 #include <utility>
 
+#include <type_traits>
+
+
+
 /** 
  \class function_base
 
- \todo Concentrate the functionality of the three classes here into one base class
- 
- \li Unify call emantics under `call`
+ Concentrates the functionality of the three classes here into one
+ base class; differentiate only on the following:
+ \li - Call semantics (model after std::invoke)
+ \li - Storage needs
+ \li - Type declarations (e.g. \c using and \c typedef directives)
  */
 template<bool Fn_const, class Class_t, class Ret_t, class ... Param_ts>
 struct function_base{};
 
 
 
-template< class Fn_ptr_t>
+template< class Fn_ptr_t, class Class_t = void>
 class function;
 
 //template< class R, class... Args >
 //class function<R(Args...)>
 
+/**
+ Unimplemented specialization for function pointer.
+ */
 template<typename Ret_t, typename ... Param_ts>
-struct function<Ret_t (*) (Param_ts...)>;
+struct function<Ret_t (*) (Param_ts...), void>;
 
 
 template< class Ret_t, class ... Param_ts >
-class function<Ret_t(Param_ts...)>
+class function<Ret_t(Param_ts...), void>
 {
 public:
 
@@ -184,69 +193,72 @@ namespace test {
 //template< class R, class T >
 ///*unspecified*/ mem_fn(R T::* pm);
 
-template<class Fn_ptr_t>
-class member_function;
+//template<class Fn_ptr_t>
+//class member_function;
 
-template<class Class_t, class Ret_t, class ... Param_ts>
-class member_function<Ret_t (Class_t::*)(Param_ts...)const>
+template<class Object_t, class Class_t, class Ret_t, class ... Param_ts>
+class function<Ret_t (Class_t::*)(Param_ts...)const, Object_t>
 {
     typedef Ret_t (Class_t::*class_fn_ptr_type)( Param_ts... ) const;
 public:
 
     using type = Ret_t (Class_t::*)(Param_ts...) const;
 
-    using class_type = Class_t;
-    using ret_type = Ret_t;
-    using funct_type = type;
-    using param_type = std::tuple<Param_ts...>;
-    //    using self_type = member_function<Class_t,Ret_t,Param_ts...>;
-    using self_type = member_function<type>;
+    using object_type   = Object_t;
+    using class_type    = Class_t;
+    using ret_type      = Ret_t;
+    using funct_type    = type;
+    using param_type    = std::tuple<Param_ts...>;
+    using self_type     = function<type,Class_t>;
 
-    //TODO: This class should have the same methods as the class below
-};
+    template <class n_class_t>
+    using new_self_type = function<type,n_class_t>;
 
-template<class Class_t, class Ret_t, class ... Param_ts>
-class member_function<Ret_t (Class_t::*)(Param_ts...)>
-{
-    typedef Ret_t (Class_t::*class_fn_ptr_type)( Param_ts... );
-public:
+    template <class new_obj_t>
+    using new_class_type
+    = typename std::remove_cv
+    < typename std::remove_pointer<new_obj_t>::type
+    >::type;
 
-    using type = Ret_t (Class_t::*)(Param_ts...);
-
-    using class_type = Class_t;
-    using ret_type = Ret_t;
-    using funct_type = type;
-    using param_type = std::tuple<Param_ts...>;
-//    using self_type = member_function<Class_t,Ret_t,Param_ts...>;
-    using self_type = member_function<type>;
+    template <class new_obj_t>
+    using is_obj_same_class
+    = std::is_same
+    < class_type
+    , typename std::remove_cv
+    < typename std::remove_pointer<new_obj_t>::type
+    >::type
+    >;
 
     constexpr
-    member_function() :
+    function() :
     cls_obj_ptr(0),
     cls_fun_ptr(0)
     {}
-    /**
-     * Explicit constructor.
-     * @param obj 	Pointer to member object: ( & member_instance )
-     * @param fn	Reference to function: ( & member_name::function_name)
-     */
+
     constexpr
-    member_function(class_type * obj, funct_type fn) :
+    function(const class_type * obj, const funct_type fn) :
     cls_obj_ptr(obj),
     cls_fun_ptr(fn)
     {}
 
 
+    template<class _class_t>
     constexpr inline
-    self_type
-    with(class_type * obj) const {
-        return member_function(obj,cls_fun_ptr);
+    typename std::enable_if
+    < is_obj_same_class<_class_t>::value
+    , function< type,new_class_type<_class_t> >
+    >::type
+    with(const _class_t * obj) const {
+        return function
+        < type
+        , new_class_type<_class_t>
+        >(obj,cls_fun_ptr);
     }
 
 
     constexpr inline
     ret_type
-    call (class_type *obj, Param_ts ... param_args) const
+    call (const class_type *obj, Param_ts ... param_args) const
     {
         return ((*obj).*cls_fun_ptr)(param_args...);
     }
@@ -272,8 +284,108 @@ public:
     }
 
 private:
-    class_type *      cls_obj_ptr;
-    class_fn_ptr_type cls_fun_ptr;
+    const class_type *      cls_obj_ptr;
+    const class_fn_ptr_type cls_fun_ptr;
+
+    static_assert(is_obj_same_class<object_type>::value
+                  ,"Object type must be same as class type.");
+};
+
+
+template<class Object_t, class Class_t, class Ret_t, class ... Param_ts>
+class function<Ret_t (Class_t::*)(Param_ts...), Object_t>
+{
+    typedef Ret_t (Class_t::*class_fn_ptr_type)( Param_ts... );
+public:
+
+    using type = Ret_t (Class_t::*)(Param_ts...);
+
+    using object_type   = Object_t;
+    using class_type    = Class_t;
+    using ret_type      = Ret_t;
+    using funct_type    = type;
+    using param_type    = std::tuple<Param_ts...>;
+    using self_type     = function<type,object_type>;
+
+    template <class n_class_t>
+    using new_self_type = function<type,n_class_t>;
+
+    template <class new_obj_t>
+    using new_class_type
+    = typename std::remove_cv
+    < typename std::remove_pointer<new_obj_t>::type
+    >::type;
+
+    template <class new_obj_t>
+    using is_obj_same_class
+    = std::is_same
+    < class_type
+    , typename std::remove_cv
+        < typename std::remove_pointer<new_obj_t>::type
+        >::type
+    >;
+
+    constexpr
+    function() :
+    cls_obj_ptr(0),
+    cls_fun_ptr(0)
+    {}
+
+    constexpr
+    function(const class_type * obj, const funct_type fn) :
+    cls_obj_ptr(obj),
+    cls_fun_ptr(fn)
+    {}
+
+
+    template<class _class_t>
+    constexpr inline
+    typename std::enable_if
+    < is_obj_same_class<_class_t>::value
+    , function< type, new_class_type<_class_t> >
+    >::type
+    with(const _class_t * obj) const {
+        return function
+        < type
+        , new_class_type<_class_t>
+        >(obj,cls_fun_ptr);
+    }
+
+
+    constexpr inline
+    ret_type
+    call (const class_type *obj, Param_ts ... param_args) const
+    {
+        return ((*obj).*cls_fun_ptr)(param_args...);
+    }
+
+    constexpr inline
+    ret_type
+    call (Param_ts ... param_args) const
+    {
+        return ((*cls_obj_ptr).*cls_fun_ptr)(param_args...);
+    }
+
+    constexpr inline
+    ret_type
+    operator() (Param_ts ... param_args) const
+    {
+        return call(param_args...);
+    }
+
+    constexpr inline
+    operator bool() const
+    {
+        return (cls_obj_ptr!=0 && cls_fun_ptr!=0);
+    }
+
+private:
+    const class_type *      cls_obj_ptr;
+    const class_fn_ptr_type cls_fun_ptr;
+
+    static_assert(is_obj_same_class<object_type>::value
+                  ,"Object type must be same as class type.");
+
 };
 
 //template<typename Cls_t, typename Ret_t, typename ... Param_ts>
@@ -287,9 +399,9 @@ private:
 template<typename Cls_t, typename Ret_t, typename ... Param_ts>
 constexpr
 auto get_Fn(Ret_t (Cls_t::*fn_ptr)(Param_ts...))
-->  member_function<Ret_t (Cls_t::*)(Param_ts...)>
+->  function<Ret_t (Cls_t::*)(Param_ts...),Cls_t>
 {
-    return member_function<Ret_t (Cls_t::*)(Param_ts...)>(0,fn_ptr);
+    return function<Ret_t (Cls_t::*)(Param_ts...),Cls_t>(0,fn_ptr);
 }
 
 //template<typename Cls_t, typename Ret_t, typename ... Param_ts>
@@ -303,33 +415,57 @@ auto get_Fn(Ret_t (Cls_t::*fn_ptr)(Param_ts...))
 template<typename Cls_t, typename Ret_t, typename ... Param_ts>
 constexpr
 auto get_Fn(Ret_t (Cls_t::*fn_ptr)(Param_ts...) const)
-->  member_function<Ret_t (Cls_t::*)(Param_ts...)>
+->  function<Ret_t (Cls_t::*)(Param_ts...)const,Cls_t>
 {
-    return member_function<Ret_t (Cls_t::*)(Param_ts...)>(0,fn_ptr);
+    return function<Ret_t (Cls_t::*)(Param_ts...)const,Cls_t>(0,fn_ptr);
 }
 namespace test
 {
-    struct cls
+    template<class val_t>
+    struct cls_t
     {
-        bool value;
+        using value_type = val_t;
+        value_type value;
+
+        constexpr
+        cls_t(value_type val):value(val)
+        {}
+
         static constexpr
-        bool fn0(){
+        value_type fn0(){
             return true;
         }
-        bool fn1(){
-            return true;
-        }
-        constexpr
-        bool fn2() const{
+        value_type fn1(){
             return true;
         }
         constexpr
-        bool fn3(bool arg) const{
+        value_type fn2() const{
+            return true;
+        }
+        constexpr
+        value_type fn3(value_type arg) const{
+            return arg;
+        }
+        constexpr
+        value_type fn4() const{
+            return value;
+        }
+        constexpr
+        value_type fn5(const value_type arg) const{
             return arg;
         }
     };
-    cls obj0;
-    cls obj1 { true };
+
+    using non_cls = cls_t<int>;
+
+    using cls = cls_t<bool>;
+
+    constexpr cls obj0(false);
+    constexpr cls obj1(true);
+//    cls obj0(false);
+//    cls obj1(true);
+
+    constexpr non_cls bad_obj(true);
 
     static_assert(std::is_same
                   < bool()
@@ -345,11 +481,14 @@ namespace test
                   >::value,"");
     static_assert(std::is_same
                   < bool(cls::*)()
-                  , member_function<decltype(&cls::fn1)>::type
+                  , function<decltype(&cls::fn1),cls>::type
                   >::value,"");
 
     static_assert(get_Fn(&cls::fn1).with(&obj0),"");
     static_assert(get_Fn(&cls::fn1).with(&obj1),"");
+
+    //this line should fail
+//    static_assert(get_Fn(&cls::fn1).with(&bad_obj),"");
 
 
     static_assert(std::is_same
@@ -358,17 +497,36 @@ namespace test
                   >::value,"");
     static_assert(std::is_same
                   < bool(cls::*)() const
-                  , std::remove_cv<decltype(&cls::fn2)>::type
-                  >::value ,"");
-    static_assert(std::is_const
-                  <decltype(&cls::fn2)
-                  >::value == false,"");
+                  , function<decltype(&cls::fn2),cls>::type
+                  >::value,"");
+    // NOTE: const-member functions do not counst as "const" for
+    // purposes of `std::remove_cv`
     static_assert(std::is_same
                   < bool(cls::*)() const
-                  , member_function<decltype(&cls::fn2)>::type
-                  >::value,"");
+                  , std::remove_cv<decltype(&cls::fn2)>::type
+                  >::value == true /* WTF */,"");
+    // NOTE: const-member functions do not counst as "const" for
+    // purposes of `std::is_const`
+    static_assert(std::is_const
+                  <decltype(&cls::fn2)
+                  >::value == false /* WTF */,"");
 
-//    static_assert(get_Fn(&cls::fn2).call(&obj1),"");
+    static_assert(get_Fn(&cls::fn2).call(&obj0),"");
+    static_assert(get_Fn(&cls::fn2).call(&obj1),"");
+
+
+    static_assert(get_Fn(&cls::fn3).call(&obj0,true),"");
+    static_assert(get_Fn(&cls::fn3).call(&obj1,true),"");
+
+
+    static_assert(get_Fn(&cls::fn4).call(&obj0) == false,"");
+    static_assert(get_Fn(&cls::fn4).call(&obj1) == true,"");
+
+    static_assert(get_Fn(&cls::fn5).call(&obj0,true),"");
+    static_assert(get_Fn(&cls::fn5).call(&obj1,true),"");
+
+//    static_assert(get_Fn(&cls::fn4).call(&obj0,true),"");
+//    static_assert(get_Fn(&cls::fn4).call(&obj1,true),"");
 
 //    static_assert(function<decltype(cls::fn1)>(cls::fn0),"");
 
