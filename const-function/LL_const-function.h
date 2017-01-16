@@ -12,6 +12,11 @@
 #include <utility>
 #include <functional>
 
+
+
+
+
+
 template<class condition_f, class >
 struct for_const
 {
@@ -63,17 +68,17 @@ public:
 template<class... base_type>
 class va_container : public base_type... {
 public:
-    constexpr const
+    constexpr 
     va_container(const base_type & ... base_init) : 
         base_type(base_init)... { }
     
-    constexpr const
+    constexpr
     va_container(base_type && ... base_init) : 
     base_type(std::forward<base_type>(base_init))... { }
 };
 
 
-
+#if 0
 template <class funct_t>
 struct va_funct{
     typedef decltype(std::declval<funct_t()>()()) return_type;
@@ -103,12 +108,7 @@ struct va_funct{
         return (*store)=(*this)(args...);
     }
 };
-
-template<template<class Type, Type...Tps> class c_str = const_str>
-struct funct_select{
-    typedef typename std::enable_if< std::equal_to<c_str,"">, std::plus<>>::type; 
-    
-};
+#endif
 
 
 
