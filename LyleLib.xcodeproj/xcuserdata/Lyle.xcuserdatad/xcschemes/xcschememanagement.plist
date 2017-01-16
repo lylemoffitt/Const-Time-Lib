@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>3</integer>
 		</dict>
+		<key>const-data-store.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>7</integer>
+		</dict>
 		<key>const-function.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -19,20 +24,30 @@
 			<key>orderHint</key>
 			<integer>5</integer>
 		</dict>
+		<key>const-monad.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
+		</dict>
 		<key>const-string.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-        <key>const-monad.xcscheme</key>
-        <dict>
-            <key>orderHint</key>
-            <integer>6</integer>
-        </dict>
 		<key>smart-reference.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>2</integer>
+		</dict>
+		<key>stack-based.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>8</integer>
+		</dict>
+		<key>struct-reflect.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
@@ -83,6 +98,11 @@
 			<true/>
 		</dict>
 		<key>268F9DFA1A5C738200CB6CE4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>26DC337C1E2D6D9A00218BDE</key>
 		<dict>
 			<key>primary</key>
 			<true/>
