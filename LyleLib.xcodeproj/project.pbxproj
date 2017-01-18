@@ -134,6 +134,7 @@
 		268F9DFB1A5C738200CB6CE4 /* smart-reference */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "smart-reference"; sourceTree = BUILT_PRODUCTS_DIR; };
 		268F9DFD1A5C738200CB6CE4 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		268F9E041A5C740600CB6CE4 /* LL_smart-reference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LL_smart-reference.h"; sourceTree = "<group>"; };
+		26BE1F321E2DCF2F008E13DB /* ring_buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ring_buffer.h; sourceTree = "<group>"; };
 		26DC337D1E2D6D9A00218BDE /* stack-based */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "stack-based"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26DC337F1E2D6D9A00218BDE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -319,6 +320,7 @@
 			isa = PBXGroup;
 			children = (
 				26DC337F1E2D6D9A00218BDE /* main.cpp */,
+				26BE1F321E2DCF2F008E13DB /* ring_buffer.h */,
 			);
 			path = "stack-based";
 			sourceTree = "<group>";
@@ -1066,6 +1068,7 @@
 				26DC33821E2D6D9A00218BDE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
