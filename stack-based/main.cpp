@@ -82,7 +82,11 @@ public:
     // cannot be defualt constructed
     ring_buffer() = delete;
 
-    // Contstruct using a pre-allocated array
+    /** Contstruct using a pre-allocated array
+     \example
+        int array[20];
+        ring_buffer buf(array);
+     */
     template<size_type _num>
     ring_buffer( data_type (&array) [_num] ):
     data_begin(array),
@@ -92,56 +96,93 @@ public:
     write_ptr((data_type*)&data_begin[0])
     {}
 
+    /** Total size; same as backing array
+     */
     inline
     const size_type size() const {
         return number;
     }
+    /** Number of elements stored in buffer
+     */
     inline
     size_type length() const{
         return ( (write_ptr+number) - read_ptr) % number;
     }
+    /** The buffer is full, further writes will drop elements
+     */
     inline
     bool is_full()const{
         return length() == size()-1;
     }
+    /** The buffer is empty
+     */
     inline
     bool is_empty()const{
         return read_ptr == write_ptr;
     }
-
+    /** Add (push) data to end of buffer; drop last if full
+     */
     inline
     data_type & write(const data_type & dat){
         data_type & ret = *write_ptr = dat;
         if(ptr_incr(write_ptr) == read_ptr){ ptr_incr(read_ptr); }
         return ret;
     }
+    /** Read (pop) data from buffer; destructive
+     */
     inline
     data_type & read(){
         data_type & ret = *read_ptr;
         ptr_incr(read_ptr);
         return ret;
     }
+    /** Check last element of buffer; non-destructive
+     */
     inline
     data_type & peek() const{
         return *read_ptr;
     }
-
+    /** Add data to back of buffer
+     \sa write
+     \param in variable to read datum from
+     \example
+        int data = 10;
+        buffer.push(data).push(data);
+     */
     inline
     self_type & push(const data_type & in){
         write(in);
         return *this;
     }
+    /** Remove data from front of buffer
+     \sa read
+     \param out variable to read datum to
+     \example
+     int d1,d2 ;
+     buffer.pop(d1).pop(d2);
+     */
     inline
     self_type & pop(data_type & out){
         out = read();
         return *this;
     }
+    /** Remove data from front of buffer (and drop it)
+     */
     inline
     self_type & pop(){
         ptr_incr(read_ptr);
         return *this;
     }
-
+    /** Call a function on each value
+     \param callback 
+        A function of type \code void (const data_type &) \endcode
+     \example
+        # Call with defined function
+        void func(const int & value){ ... };
+        buff.each(func);
+        # Call with lambda
+        buff.each([](const int & value){ ... });
+     */
     template<class fn_type>
     inline
     self_type& each(fn_type callback){
@@ -150,6 +191,16 @@ public:
         }
         return *this;
     }
+    /** Map a function on each value (write-back)
+     \param callback
+        A function of type \code data_type (const data_type &) \endcode
+     \example
+         # Call with defined function
+         void func(const int & value){ return ... ; };
+         buff.map(func);
+         # Call with lambda
+         buff.map([](const int & value){ return ... ; });
+     */
     template<class fn_type>
     inline
     self_type& map(fn_type callback){
@@ -158,7 +209,8 @@ public:
         }
         return *this;
     }
-
+    /** Fill will constant value
+     */
     inline
     self_type & fill(data_type value){
         while(is_full() != true){
@@ -166,6 +218,16 @@ public:
         }
         return *this;
     }
+    /** Fill with generated value
+     \param generator
+         A function of type \code data_type (void) \endcode
+     \example
+         # Call with defined function
+         int func(){ return ... ; };
+         buff.fill(func);
+         # Call with lambda
+         buff.fill([](){ return ... ; });
+     */
     template<class fn_type>
     inline
     self_type & fill(fn_type generator){
@@ -174,6 +236,11 @@ public:
         }
         return *this;
     }
+    /** Remove matching values
+     Pop values for which the callback returns true; stops at first false
+     \param callback
+        A function of type \code bool (const data_type &) \endcode
+     */
     template<class fn_type>
     inline
     self_type & trim(fn_type callback){
@@ -182,6 +249,18 @@ public:
         }
         return *this;
     }
+    /** Sort contained data according to strict-weak-ordering comparator
+     \param compare
+        A function of type \code bool (const data_type &,const data_type &) \endcode.
+        This is a function that compares two values, and returns true if the
+        first should be \em before the second.
+     \example
+         # Call with defined function
+         bool less(const int & lhs,const int & rhs){ return lhs<rhs; };
+         buff.sort(less);
+         # Call with lambda
+         buff.sort([](const int & lhs,const int & rhs){ return lhs<rhs; });
+     */
     template<class fn_type>
     inline
     self_type & sort(fn_type compare){
@@ -201,26 +280,12 @@ public:
         return *this;
     }
 
-
-    void sub_align (data_type* pivot, data_type* begin, data_type* end){
-        //            data_type*  pivot = read_ptr;
-        offset_type off_sz  = pivot-begin;
-        offset_type ext_sz  = end - pivot;
-        offset_type range   = end - begin;
-
-        for(offset_type step=1; step<=off_sz; ++step){
-            swap( *(pivot-step), *(end-step) );
-        }
-        if( range%ext_sz ){
-            sub_align( begin+(range%ext_sz), begin, begin+ext_sz );
-        }
-
-    };
-
+    /** Align ring with backing array
+     Moves data so that the indexes of the elements match the indexes of the 
+     array they are stored in.
+     */
     inline
     self_type & align(){
-//        sub_align(read_ptr, begin(), end());
-
         for( data_type *p_ptr=read_ptr, *b_ptr=begin(), *e_ptr=end();; )
         {
             const offset_type off_sz  = p_ptr - b_ptr;
@@ -242,15 +307,27 @@ public:
         read_ptr    = begin();
         return *this;
     }
+    /** Shallow duplicate
+     \warning Modifying the buffer from this copy may result in dropped data.
+     */
     inline
     self_type dup(){
         return copy(read_ptr, write_ptr);
     }
+    /** Buffer of non-valid data
+     \example
+     \code
+                 ^\pop             push\v
+     Data [ 4] = [ (1 _  2 _  3 _  4)_ :0:,  0 ,  0 ,  0 ,  0 , -1  ]
+                    \_ valid data _/    \_     extent data      _/
+     \endcode
+     */
     inline
     self_type extent(){
         return copy(write_ptr,read_ptr);
     }
-
+    /** Make the buffer empty
+     */
     inline
     self_type & clear(){
         read_ptr = write_ptr = begin();
@@ -258,12 +335,24 @@ public:
     }
 };
 
+/** Make a ring buffer
+ \param array Staticly sized array, e.g. \c int[10]
+ Utility function to generate a \c ring_buffer , deduced from the parameter
+ info.
+ \example 
+    int data [20]
+    auto ring = make_ring(data);
+ */
 template<class data_t, uint16_t count>
 auto make_ring(data_t (&array) [count] )->ring_buffer<data_t>
 {
     return ring_buffer<data_t> (array);
 }
 
+/* -------------------------------------------------------------------------- */
+/*  End of library. Below here is testing code.
+ */
+/* -------------------------------------------------------------------------- */
 
 void print(const int & val){
     printf("%2d, ",val);
