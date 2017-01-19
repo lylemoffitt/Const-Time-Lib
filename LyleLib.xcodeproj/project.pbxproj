@@ -126,6 +126,7 @@
 		26262F171A4143EF00D4E094 /* const-function */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "const-function"; sourceTree = BUILT_PRODUCTS_DIR; };
 		26262F191A4143EF00D4E094 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		26262F201A41441500D4E094 /* LL_const-function.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LL_const-function.h"; sourceTree = "<group>"; };
+		266185F91E30AA8B00E23D4C /* ring_buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ring_buffer.h; sourceTree = "<group>"; };
 		2676403D1AB7E08B000B0AE3 /* Base64 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Base64; sourceTree = BUILT_PRODUCTS_DIR; };
 		2676403F1AB7E08B000B0AE3 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		267640461AB7E0B9000B0AE3 /* LL_base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LL_base64.cpp; sourceTree = "<group>"; };
@@ -321,6 +322,7 @@
 			children = (
 				26DC337F1E2D6D9A00218BDE /* main.cpp */,
 				26BE1F321E2DCF2F008E13DB /* slice.h */,
+				266185F91E30AA8B00E23D4C /* ring_buffer.h */,
 			);
 			path = "stack-based";
 			sourceTree = "<group>";
