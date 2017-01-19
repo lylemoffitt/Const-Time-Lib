@@ -59,8 +59,20 @@ private:
     }
 
     inline
-    bool ptr_valid( const data_ptr_type & ptr )const{
-        return begin() <= ptr && ptr <= end();
+    bool ptr_is_valid( const data_ptr_type & ptr )const{
+        return begin() <= ptr && ptr <  end();
+    }
+
+    inline
+    bool ptr_is_data( const data_ptr_type & ptr )const{
+        if( write_ptr > read_ptr ){
+            return  (read_ptr <= ptr && ptr < write_ptr);
+        }//else
+        if( read_ptr > write_ptr){
+            return  (read_ptr <= ptr && ptr < end())
+            ||      (begin()  <= ptr && ptr < write_ptr);
+        }//else
+        return false;
     }
 
     inline
@@ -68,41 +80,10 @@ private:
         assert( (ptr > begin()-size()) && (ptr < end()+size())
                && "Pointer widly out of bounds");
         if( ptr < begin() ){
-            return size() - ((end() - ptr) % size());
+            return ((size() + ptr) - begin()) % size();
         }else{
             return (ptr - begin()) % size();
         }
-    }
-
-    inline
-    size_type ptr_index( const data_ptr_type & ptr ) const{
-        if( write_ptr > read_ptr ){ return ptr - read_ptr; }
-        if( write_ptr < read_ptr ){ return length() - (ptr - begin()); }
-//        return ptr - begin();
-        return ptr_offset(write_ptr);
-    }
-
-    inline
-    data_type * ptr_bound( const data_ptr_type & ptr ,
-                           const data_ptr_type & max ,
-                           const data_ptr_type & min ) const{
-        assert(begin() <= ptr && ptr < end());
-//        if( ptr <= begin()  ){ return begin();  }
-//        if( ptr >= end()    ){ return end();    }
-        if( max > min ){
-            if( ptr <= min  ){ return min;  }
-            if( ptr >= max  ){ return max;  }
-            return ptr;
-        }
-        if( max < min ){
-            if( ptr >= max && ptr < min     ){ return max;  }
-            return ptr;
-        }
-        if( min == max ){
-            return max;
-        }
-        return ptr;
-//        return nullptr; //Unreachable
     }
 
     ring_buffer(const data_type * b_ptr , const data_type * e_ptr   ,
@@ -113,11 +94,11 @@ private:
     read_ptr(r_ptr),
     write_ptr(w_ptr)
     {
-        assert(data_end>data_begin
+        assert(data_end > data_begin
                && "data_end before data_begin");
-        assert(data_begin < read_ptr && read_ptr < data_end
+        assert(data_begin <= read_ptr && read_ptr <= data_end
                && "read_ptr not in bounds");
-        assert(data_begin < write_ptr && write_ptr < data_end
+        assert(data_begin <= write_ptr && write_ptr <= data_end
                && "write_ptr not in bounds");
     }
 
@@ -180,7 +161,7 @@ public:
      */
     inline
     data_type & write(const data_type & dat){
-        assert( write_ptr!=end() );
+        assert( ptr_is_valid(write_ptr) );
         data_type & ret = *write_ptr = dat;
         if(ptr_incr(write_ptr) == read_ptr){ ptr_incr(read_ptr); }
         return ret;
@@ -189,7 +170,7 @@ public:
      */
     inline
     data_type & read(){
-        assert( read_ptr!=end() );
+        assert( ptr_is_valid(read_ptr) );
         data_type & ret = *read_ptr;
         ptr_incr(read_ptr);
         return ret;
