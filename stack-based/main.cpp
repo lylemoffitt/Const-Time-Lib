@@ -10,12 +10,7 @@
 
 //#include "ring_buffer.h"
 
-template<class type>
-void swap(type & lhs, type & rhs){
-    type temp = lhs;
-    lhs = rhs;
-    rhs = temp;
-}
+
 
 template<class _data_t>
 class ring_buffer
@@ -366,6 +361,10 @@ auto make_ring(data_t (&array) [count] )->ring_buffer<data_t>
  */
 /* -------------------------------------------------------------------------- */
 
+#define TEST_SIZE 10
+//#define TEST_RANDOM
+#define TEST_REPEAT 1
+
 void print(const int & val){
     printf("%2d, ",val);
 }
@@ -433,10 +432,18 @@ void gen_buffer (int off, int len, fn call){
     auto buff = make_ring(data);
 
     for(int i=1; i<=off; ++i){
+#ifdef TEST_RANDOM
+        buff.push(rand()%TEST_SIZE-rand()%TEST_SIZE).pop();
+#else
         buff.push(-i).pop();
+#endif
     }
     for(int j=1; j<=len; ++j){
+#ifdef TEST_RANDOM
+        buff.push(rand()%TEST_SIZE);
+#else
         buff.push(j);
+#endif
     }
     call( data, (ring_buffer<int>&)buff );
 };
@@ -500,7 +507,7 @@ int main(int argc, const char * argv[]) {
 
 
     auto alias_test = [](int off, int len, bool do_align){
-        gen_buffer<10>(off, len, [&]( int (data)[], ring_buffer<int> & buff){
+        gen_buffer<TEST_SIZE>(off, len, [&]( int (data)[], ring_buffer<int> & buff){
             if( do_align ){
                 printf("\n%11s[%d,%d]:\t","Aligned",off,len);
                 buff
@@ -519,26 +526,29 @@ int main(int argc, const char * argv[]) {
         });
     };
 
-    for(int once=1, off=rand()%10; once; once=0){
+    for(int repeats = TEST_REPEAT; repeats!=0; repeats--)
+#ifdef TEST_RANDOM
+    for(int once=1, off=rand()%10; once; once=0)
+#else
+    for(int off = 0; off<TEST_SIZE; ++off)
+#endif
+    {
         std::cout << std::endl;
-        for(int len=0; len<10; ++len){
+        for(int len=0; len<TEST_SIZE; ++len){
             alias_test(off,len,false);
         }
-        for(int len=0; len<10; ++len){
+        for(int len=0; len<TEST_SIZE; ++len){
             alias_test(off,len,true);
         }
     }
 
-    for(int i=0; i<3; ++i){
-        int off = rand()%10, len = rand()%10;
-        gen_buffer<10>(off, len, [&]( int (data)[], ring_buffer<int> & buff){
-            for( int i = rand()%20; i<10; ++i){
-                if( rand()%2 ){
-                    buff.push(rand()%10 - rand()%10);
-                }else{
-                    buff.pop();
-                }
-            }
+    for(int repeats = TEST_REPEAT; repeats!=0; repeats--){
+#ifdef TEST_RANDOM
+        int off = rand()%TEST_SIZE, len = rand()%TEST_SIZE;
+#else
+        for(int off = 0, len = 0; off<TEST_SIZE; (++len==TEST_SIZE)?(len=0,++off):(0))
+#endif
+        gen_buffer<TEST_SIZE>(off, len, [&]( int (data)[], ring_buffer<int> & buff){
             std::cout << std::endl;
             printf("\n%11s[%d,%d]:\t","Random buffer",off,len);
             buff
