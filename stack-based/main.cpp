@@ -388,10 +388,6 @@ public:
         const bool empty = is_empty();
 
         int d_width = 4;
-        //    buff.each([&](const int& val){
-        //        int digits = (int)std::to_string(val).length();
-        //        if( digits > d_width ){ d_width++; }
-        //    });
         auto fmt_str = [&](uint16_t i){
             auto str = std::to_string(array[i]);
             char sep = ',';
@@ -446,7 +442,8 @@ auto make_ring(data_t (&array) [count] )->ring_buffer<data_t>
 /* -------------------------------------------------------------------------- */
 
 #define TEST_SIZE 10
-//#define TEST_RANDOM
+#define TEST_RANDOM_DATA    // vs Linear Data
+//#define TEST_RANDOM_TRIALS  // vs Linear (quadratic) Trials
 #define TEST_REPEAT 1
 
 void print(const int & val){
@@ -465,14 +462,14 @@ void gen_buffer (int off, int len, fn call){
     auto buff = make_ring(data);
 
     for(int i=1; i<=off; ++i){
-#ifdef TEST_RANDOM
+#ifdef TEST_RANDOM_DATA
         buff.push(rand()%TEST_SIZE-rand()%TEST_SIZE).pop();
 #else
         buff.push(-i).pop();
 #endif
     }
     for(int j=1; j<=len; ++j){
-#ifdef TEST_RANDOM
+#ifdef TEST_RANDOM_DATA
         buff.push(rand()%TEST_SIZE);
 #else
         buff.push(j);
@@ -570,7 +567,7 @@ int main(int argc, const char * argv[]) {
     };
 
     for(int repeats = TEST_REPEAT; repeats!=0; repeats--)
-#ifdef TEST_RANDOM
+#ifdef TEST_RANDOM_TRIALS
     for(int once=1, off=rand()%10; once; once=0)
 #else
     for(int off = 0; off<TEST_SIZE; ++off)
@@ -586,7 +583,7 @@ int main(int argc, const char * argv[]) {
     }
 
     for(int repeats = TEST_REPEAT; repeats!=0; repeats--){
-#ifdef TEST_RANDOM
+#ifdef TEST_RANDOM_TRIALS
         int off = rand()%TEST_SIZE, len = rand()%TEST_SIZE;
 #else
         for(int off = 0, len = 0; off<TEST_SIZE; (++len==TEST_SIZE)?(len=0,++off):(0))
@@ -603,6 +600,7 @@ int main(int argc, const char * argv[]) {
             buff
             .sort([](const int & lhs, const int & rhs){
                 return lhs<rhs;
+//                return abs(lhs)<abs(rhs);
             })
             .each(print)
             .extent().each(pad).extent()
