@@ -10,7 +10,7 @@
 #include <cassert>
 
 //#include "ring_buffer.h"
-
+#define TESTING
 
 
 template<class _data_t>
@@ -352,18 +352,25 @@ public:
         return *this;
     }
     /** Shallow duplicate
-     \warning Modifying the buffer from this copy may result in dropped data.
+     \warning 
+        Modifying the buffer from this copy may result in dropped data.
      */
     inline
     self_type dup(){
         return copy(read_ptr, write_ptr);
     }
     /** Buffer of non-valid data
+     \return 
+        The 'photo-negative' of the ring, aka the "extents". This is revertable
+        to the original ring buffer, by calling \c extent() again.
+     \warning
+         Modifying the buffer from this copy may result in dropped data.      
+        \sa dup()
      \example
      \code
-                 ^\pop             push\v
+     #          pop|^|             push|v|
      Data [ 4] = [ (1 _  2 _  3 _  4)_ :0:,  0 ,  0 ,  0 ,  0 , -1  ]
-                    \_ valid data _/    \_     extent data      _/
+     #      begin|  \_ valid data _/    \_     extent data      _/  |end
      \endcode
      */
     inline
@@ -378,6 +385,7 @@ public:
         return *this;
     }
 
+#ifdef TESTING
     void print_data(){
         auto array = begin();
         const auto  len     = length();
@@ -420,6 +428,7 @@ public:
         }
         printf(" ]");
     }
+#endif
 };
 
 /** Make a ring buffer
