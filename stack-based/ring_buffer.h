@@ -393,6 +393,18 @@ public:
     }
 
 #ifdef TESTING
+    /** Print out a representation of the underlying data
+     \note 
+        This function is only available it \c TESTING is defined before
+        inclusion of the header.
+     \example
+        It looks like this.
+     \code
+     #          pop|^|             push|v|
+     Data [ 4] = [ (1 _  2 _  3 _  4)_ :0:,  0 ,  0 ,  0 ,  0 , -1  ]
+     #      begin|  \_ valid data _/    \_     extent data      _/  |end
+     \endcode
+     */
     void print_data(){
         auto array = begin();
         const auto  len     = length();
