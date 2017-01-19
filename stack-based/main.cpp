@@ -55,14 +55,54 @@ private:
     }
     inline
     data_type * ptr_wrap( const data_ptr_type & ptr ) const{
-        assert(begin() <= ptr && ptr < end());
-        return begin() + ( ptr_offset(ptr) % size() );
+        return begin() + ptr_offset(ptr);
+    }
+
+    inline
+    bool ptr_valid( const data_ptr_type & ptr )const{
+        return begin() <= ptr && ptr <= end();
     }
 
     inline
     size_type ptr_offset( const data_ptr_type & ptr ) const{
+        assert( (ptr > begin()-size()) && (ptr < end()+size())
+               && "Pointer widly out of bounds");
+        if( ptr < begin() ){
+            return size() - ((end() - ptr) % size());
+        }else{
+            return (ptr - begin()) % size();
+        }
+    }
+
+    inline
+    size_type ptr_index( const data_ptr_type & ptr ) const{
+        if( write_ptr > read_ptr ){ return ptr - read_ptr; }
+        if( write_ptr < read_ptr ){ return length() - (ptr - begin()); }
+//        return ptr - begin();
+        return ptr_offset(write_ptr);
+    }
+
+    inline
+    data_type * ptr_bound( const data_ptr_type & ptr ,
+                           const data_ptr_type & max ,
+                           const data_ptr_type & min ) const{
         assert(begin() <= ptr && ptr < end());
-        return ptr - begin();
+//        if( ptr <= begin()  ){ return begin();  }
+//        if( ptr >= end()    ){ return end();    }
+        if( max > min ){
+            if( ptr <= min  ){ return min;  }
+            if( ptr >= max  ){ return max;  }
+            return ptr;
+        }
+        if( max < min ){
+            if( ptr >= max && ptr < min     ){ return max;  }
+            return ptr;
+        }
+        if( min == max ){
+            return max;
+        }
+        return ptr;
+//        return nullptr; //Unreachable
     }
 
     ring_buffer(const data_type * b_ptr , const data_type * e_ptr   ,
