@@ -377,6 +377,53 @@ public:
         read_ptr = write_ptr = begin();
         return *this;
     }
+
+    void print_data(){
+        auto array = begin();
+        const auto  len     = length();
+
+        const long int  head  = ptr_offset(read_ptr);
+        const long int  tail  = ptr_offset(write_ptr-1);
+        const long int  next  = ptr_offset(write_ptr);
+        const bool empty = is_empty();
+
+        int d_width = 4;
+        //    buff.each([&](const int& val){
+        //        int digits = (int)std::to_string(val).length();
+        //        if( digits > d_width ){ d_width++; }
+        //    });
+        auto fmt_str = [&](uint16_t i){
+            auto str = std::to_string(array[i]);
+            char sep = ',';
+            if( i==head && !empty ){
+                str.insert(0,"(");
+                sep = '_';
+            }
+            if( i==next ){
+                str.insert(0,":"); str.append(":");
+            }
+            if( i==tail && !empty ){
+                str.append(")");
+                sep = '_';
+            }
+            if( ptr_is_data(array+i) ){
+                sep = '_';
+            }
+            if( isdigit(str.back()) ){ str.append(" "); }
+            int len = d_width-(int)str.length();
+            if( len > 0){
+                str.insert(0, len, ' ');
+            }
+            if( i+1 < size() ){ str.append(1,sep); }
+            return str;
+        };
+        printf("Data [%2d] = [",len);
+        //    printf("\nData [%2d] = [",len);
+        for(uint16_t i=0; i!=size(); ++i){
+            printf( "%s", fmt_str(i).c_str() );
+        }
+        printf(" ]");
+    }
 };
 
 /** Make a ring buffer
@@ -405,59 +452,8 @@ auto make_ring(data_t (&array) [count] )->ring_buffer<data_t>
 void print(const int & val){
     printf("%2d, ",val);
 }
-
-//template<uint16_t N>
-void print_data(int (array) [], ring_buffer<int> & buff){
-    const auto  len     = buff.length();
-    const auto  pad     = (buff.size()-len)*4;
-    const auto  size    = buff.size();
-    const int * rd_ptr  = &buff.peek();
-    const uint16_t  rd_off  = rd_ptr-array;
-    const int * wr_ptr  = array + ((len+rd_off)%size) ;
-    const uint16_t  wr_off  = ((len+rd_off)%size) - (wr_ptr==rd_ptr ? 0 : 1);
-    const bool empty = buff.is_empty();
-
-    int d_width = 4;
-//    buff.each([&](const int& val){
-//        int digits = (int)std::to_string(val).length();
-//        if( digits > d_width ){ d_width++; }
-//    });
-    auto fmt_str = [&](uint16_t i){
-        auto str = std::to_string(array[i]);
-        char sep = ',';
-        if( i==rd_off && !empty ){
-            str.insert(0,"(");  //if(len>1){ str.append("_"); }
-            sep = '_';
-        }
-        if( i==wr_off+1 ){
-            str.insert(0,":"); str.append(":");
-        }
-        if( i==wr_off && !empty ){
-            str.append(")");    //if(len>1){ str.insert(0,"_"); }
-            sep = '_';
-        }
-        if( wr_off > rd_off && (i>rd_off && i<wr_off) ){
-//            str.insert(0,"_"); str.append("_");
-            sep = '_';
-        }
-        if( rd_off > wr_off && (i>rd_off || i<wr_off) ){
-//            str.insert(0,"_"); str.append("_");
-            sep = '_';
-        }
-        if( isdigit(str.back()) ){ str.append(" "); }
-        int len = d_width-(int)str.length();
-        if( len > 0){
-            str.insert(0, len, ' ');
-        }
-        if( i+1 < size ){ str.append(1,sep); }
-        return str;
-    };
-    printf("%*c Data [%2d] = [",pad,' ',len);
-//    printf("\nData [%2d] = [",len);
-    for(uint16_t i=0; i!=size; ++i){
-        printf( "%s", fmt_str(i).c_str() );
-    }
-    printf(" ]");
+void pad(const int & val){
+    printf("%2c  ",' ');
 }
 
 template<size_t sz,class fn>
@@ -502,47 +498,54 @@ int main(int argc, const char * argv[]) {
     ring
     .fill(0)                    //init all with 0
     .push(1).push(2).push(3)    //write in 1,2,3 & drop first 0,0,0
-    .each(print);
-    print_data(raw,ring);
+    .each(print)
+    .extent().each(pad).extent()
+    .print_data();
 
     printf("\n%16s:\t","Align data");
     ring
-//    .align()
-    .each(print);
-    print_data(raw,ring);
+    .align()
+    .each(print)
+    .extent().each(pad).extent()
+    .print_data();
 
     printf("\n%16s:\t","Pop-Pop");
     ring
     .pop().pop()
-    .each(print);
-    print_data(raw,ring);
+    .each(print)
+    .extent().each(pad).extent()
+    .print_data();
 
     printf("\n%16s:\t","Trim zeros");
     ring
     .trim([](const int & val){ return val==0; })
-    .each(print);
-    print_data(raw,ring);
+    .each(print)
+    .extent().each(pad).extent()
+    .print_data();
 
     printf("\n%16s:\t","Double each");
     ring
     .push(4)
     .map([=](const int & val){ return val*2; })
-    .each(print);
-    print_data(raw,ring);
+    .each(print)
+    .extent().each(pad).extent()
+    .print_data();
 
     printf("\n%16s:\t","Juggle first");
     ring
     .pop(temp)      //pop into a temp variable
     .push(temp)     //push temp to end of buffer
-    .each(print);
-    print_data(raw,ring);
+    .each(print)
+    .extent().each(pad).extent()
+    .print_data();
 
     printf("\n%16s:\t","Fill odds");
     temp = 2;
     ring
     .fill([&](){ return ++temp%2 ? temp : ++temp; })
-    .each(print);
-    print_data(raw,ring);
+    .each(print)
+    .extent().each(pad).extent()
+    .print_data();
 
 
     auto alias_test = [](int off, int len, bool do_align){
@@ -552,15 +555,16 @@ int main(int argc, const char * argv[]) {
                 buff
                 .align()
                 .each(print)
-                //            .align()
-                ;
-                print_data(data,buff);
+                .extent().each(pad).extent()
+                .print_data();
+
             }else{
                 printf("\n%11s[%d,%d]:\t","Original",off,len);
                 buff
                 .each(print)
-                ;
-                print_data(data,buff);
+                .extent().each(pad).extent()
+                .print_data();
+
             }
         });
     };
@@ -592,17 +596,18 @@ int main(int argc, const char * argv[]) {
             printf("\n%11s[%d,%d]:\t","Random buffer",off,len);
             buff
             .each(print)
-            ;
-            print_data(data,buff);
+            .extent().each(pad).extent()
+            .print_data();
+
             printf("\n%11s[%d,%d]:\t","Sorted buffer",off,len);
             buff
             .sort([](const int & lhs, const int & rhs){
                 return lhs<rhs;
             })
             .each(print)
-            ;
-            print_data(data,buff);
-        });
+            .extent().each(pad).extent()
+            .print_data();
+      });
     }
 
 
