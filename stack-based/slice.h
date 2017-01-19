@@ -1,13 +1,13 @@
 //
-//  ring_buffer.h
+//  slice.h
 //  LyleLib
 //
 //  Created by Lyle Moffitt on 1/16/17.
 //  Copyright © 2017 Lyle Moffitt. All rights reserved.
 //
 
-#ifndef ring_buffer_h
-#define ring_buffer_h
+#ifndef slice_h
+#define slice_h
 
 template<class _sz_t>
 struct unsign;
@@ -303,4 +303,4 @@ public:
 };
 
 
-#endif /* ring_buffer_h */
+#endif /* slice_h */
