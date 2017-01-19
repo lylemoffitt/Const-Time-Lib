@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <cassert>
 
 //#include "ring_buffer.h"
 
@@ -41,22 +42,26 @@ private:
     }
     inline
     data_type * ptr_incr( data_ptr_type & ptr ) const{
+        assert(begin() <= ptr && ptr < end());
         if(++ptr == end()){ ptr = begin(); }
         return ptr;
     }
     inline
     data_type * ptr_next( const data_ptr_type & ptr ) const{
+        assert(begin() <= ptr && ptr < end());
         data_type * ret_ptr = ptr+1;
         if(ret_ptr == end()){ ret_ptr = begin(); }
         return ret_ptr;
     }
     inline
     data_type * ptr_wrap( const data_ptr_type & ptr ) const{
+        assert(begin() <= ptr && ptr < end());
         return begin() + ( ptr_offset(ptr) % size() );
     }
 
     inline
     size_type ptr_offset( const data_ptr_type & ptr ) const{
+        assert(begin() <= ptr && ptr < end());
         return ptr - begin();
     }
 
@@ -67,7 +72,14 @@ private:
     number(e_ptr-b_ptr),
     read_ptr(r_ptr),
     write_ptr(w_ptr)
-    {}
+    {
+        assert(data_end>data_begin
+               && "data_end before data_begin");
+        assert(data_begin < read_ptr && read_ptr < data_end
+               && "read_ptr not in bounds");
+        assert(data_begin < write_ptr && write_ptr < data_end
+               && "write_ptr not in bounds");
+    }
 
     inline
     self_type copy(data_type* r_ptr, data_type* w_ptr){
@@ -89,14 +101,16 @@ public:
         int array[20];
         ring_buffer buf(array);
      */
-    template<size_type _num>
-    ring_buffer( data_type (&array) [_num] ):
+    template<size_type num>
+    ring_buffer( data_type (&array) [num] ):
     data_begin(array),
-    data_end(&array[_num]),
-    number(_num),
+    data_end(&array[num]),
+    number(num),
     read_ptr((data_type*)&data_begin[0]),
     write_ptr((data_type*)&data_begin[0])
-    {}
+    {
+        static_assert(num>=2,"Array must store at least 2 items");
+    }
 
     /** Total size; same as backing array
      */
@@ -126,6 +140,7 @@ public:
      */
     inline
     data_type & write(const data_type & dat){
+        assert( write_ptr!=end() );
         data_type & ret = *write_ptr = dat;
         if(ptr_incr(write_ptr) == read_ptr){ ptr_incr(read_ptr); }
         return ret;
@@ -134,6 +149,7 @@ public:
      */
     inline
     data_type & read(){
+        assert( read_ptr!=end() );
         data_type & ret = *read_ptr;
         ptr_incr(read_ptr);
         return ret;
@@ -447,6 +463,8 @@ void gen_buffer (int off, int len, fn call){
     }
     call( data, (ring_buffer<int>&)buff );
 };
+
+
 
 int main(int argc, const char * argv[]) {
     srand((unsigned)time(nullptr));
