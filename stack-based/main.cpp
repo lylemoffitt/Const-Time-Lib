@@ -66,7 +66,7 @@ private:
     }
 
     ring_buffer(const data_type * b_ptr , const data_type * e_ptr   ,
-                data_type * r_ptr , data_type * w_ptr   ):
+                data_type * r_ptr       , data_type * w_ptr         ):
     data_begin(b_ptr),
     data_end(e_ptr),
     number(e_ptr-b_ptr),
@@ -77,6 +77,13 @@ private:
     inline
     self_type copy(data_type* r_ptr, data_type* w_ptr){
         return ring_buffer(data_begin,data_end,r_ptr,w_ptr);
+    }
+
+    inline
+    void swap(data_type & lhs, data_type & rhs){
+        data_type temp = lhs;
+        lhs = rhs;
+        rhs = temp;
     }
 public:
     // cannot be defualt constructed
@@ -268,13 +275,18 @@ public:
              lhs_ptr != write_ptr;
              ptr_incr(lhs_ptr))
         {
+            bool already_sorted = true;
             for (data_type* rhs_ptr = ptr_next(lhs_ptr);
                  rhs_ptr != write_ptr;
                  ptr_incr(rhs_ptr))
             {
                 if( not compare(*lhs_ptr,*rhs_ptr) ){
-                    swap<data_type>(*lhs_ptr,*rhs_ptr);
+                    swap(*lhs_ptr,*rhs_ptr);
+                    already_sorted = false;
                 }
+            }
+            if( already_sorted ){
+                break;
             }
         }
         return *this;
