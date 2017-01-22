@@ -14,7 +14,7 @@
 #ifdef TESTING
 #   include <cassert>
 #else
-#   define assert( )
+#   define assert( ignore_param )
 #endif
 
 
@@ -399,11 +399,11 @@ public:
         inclusion of the header.
      \example
         It looks like this.
-     \code
-     #          pop|^|             push|v|
-     Data [ 4] = [ (1 _  2 _  3 _  4)_ :0:,  0 ,  0 ,  0 ,  0 , -1  ]
-     #      begin|  \_ valid data _/    \_     extent data      _/  |end
-     \endcode
+         \code
+         #          pop|^|             push|v|
+         Data [ 4] = [ (1 _  2 _  3 _  4)_ :0:,  0 ,  0 ,  0 ,  0 , -1  ]
+         #      begin|  \_ valid data _/    \_     extent data      _/  |end
+         \endcode
      */
     void print_data(){
         auto array = begin();
