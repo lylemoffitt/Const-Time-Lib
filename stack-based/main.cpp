@@ -136,19 +136,20 @@ int main(int argc, const char * argv[]) {
         });
     };
 
-    for(int repeats = TEST_REPEAT; repeats!=0; repeats--)
+    for(int repeats = TEST_REPEAT; repeats!=0; repeats--){
 #ifdef TEST_RANDOM_TRIALS
-    for(int once=1, off=rand()%10; once; once=0)
+        for(int once=1, off=rand()%10; once; once=0)
 #else
-    for(int off = 0; off<TEST_SIZE; ++off)
+        for(int off = 0; off<TEST_SIZE; ++off)
 #endif
-    {
-        std::cout << std::endl;
-        for(int len=0; len<TEST_SIZE; ++len){
-            alias_test(off,len,false);
-        }
-        for(int len=0; len<TEST_SIZE; ++len){
-            alias_test(off,len,true);
+        {
+            std::cout << std::endl;
+            for(int len=0; len<TEST_SIZE; ++len){
+                alias_test(off,len,false);
+            }
+            for(int len=0; len<TEST_SIZE; ++len){
+                alias_test(off,len,true);
+            }
         }
     }
 
@@ -158,24 +159,35 @@ int main(int argc, const char * argv[]) {
 #else
         for(int off = 0, len = 0; off<TEST_SIZE; (++len==TEST_SIZE)?(len=0,++off):(0))
 #endif
-        gen_buffer<TEST_SIZE>(off, len, [&]( int (data)[], ring_buffer<int> & buff){
-            std::cout << std::endl;
-            printf("\n%11s[%d,%d]:\t","Random buffer",off,len);
-            buff
-            .each(print)
-            .extent().each(pad).extent()
-            .print_data();
+            gen_buffer<TEST_SIZE>(off, len, [&]( int (data)[], ring_buffer<int> & buff){
+                std::cout << std::endl;
+                printf("\n%11s[%d,%d]:\t","Random buffer",off,len);
+                buff
+                .each(print)
+                .extent().each(pad).extent()
+                .print_data();
 
-            printf("\n%11s[%d,%d]:\t","Sorted buffer",off,len);
-            buff
-            .sort([](const int & lhs, const int & rhs){
-                return lhs<rhs;
-//                return abs(lhs)<abs(rhs);
-            })
-            .each(print)
-            .extent().each(pad).extent()
-            .print_data();
-      });
+                printf("\n%11s[%d,%d]:\t","Sorted buffer",off,len);
+                buff
+                .sort([](const int & lhs, const int & rhs){
+                    return lhs<rhs;
+    //                return abs(lhs)<abs(rhs);
+                })
+                .each(print)
+                .extent().each(pad).extent()
+                .print_data();
+          });
+    }
+
+    for(int repeats = TEST_REPEAT; repeats!=0; repeats--){
+#ifdef TEST_RANDOM_TRIALS
+        int off = rand()%TEST_SIZE, len = rand()%TEST_SIZE;
+#else
+        for(int off = 0, len = 0; off<TEST_SIZE; (++len==TEST_SIZE)?(len=0,++off):(0))
+#endif
+            gen_buffer<TEST_SIZE>(off, len, [&]( int (data)[], ring_buffer<int> & buff){
+                assert(buff.clear().is_empty());
+            });
     }
 
 
